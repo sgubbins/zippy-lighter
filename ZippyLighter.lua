@@ -6,11 +6,15 @@ local addonName, addonTable = ...;
 local BASIC_FIRE_SPELL_ID = 818;
 local COOKING_SPELL_ID = 2550;
 
--- local RAGNAROS_PET_SPECIES_ID = 52;	-- fake for testing
+--local RAGNAROS_PET_SPECIES_ID = 474;	-- fake for testing
 local RAGNAROS_PET_SPECIES_ID = 297;
--- local WICKERMAN_ITEM_ID = 6948;	-- fake for testing
+local PIERRE_PET_SPECIES_ID = 1204;
+
+-- local ETERNAL_KILN_ITEM_ID = 6948;	-- fake for testing
+-- local ETERNAL_KILN_ITEM_ID = 6948;	-- fake for testing
 local WICKERMAN_ITEM_ID = 70722;
 local GRIM_CAMPFIRE_ITEM_ID = 67097;
+local ETERNAL_KILN_ITEM_ID = 104309;
 
 function FZL_OnEvent(self, event, ...)
 
@@ -229,7 +233,16 @@ function FZL_ShowFlyout()
 		FZL_SetupFlyoutButton(buttonIndex, "item:"..GRIM_CAMPFIRE_ITEM_ID);
 		buttonIndex = buttonIndex + 1;
 	end
-	local petID, name, icon = FZL_RagnarosPetID()
+	if (GetItemCount(ETERNAL_KILN_ITEM_ID) > 0) then
+		FZL_SetupFlyoutButton(buttonIndex, "item:"..ETERNAL_KILN_ITEM_ID);
+		buttonIndex = buttonIndex + 1;
+	end
+	local petID, name, icon = FZL_PetInfoForSpeciesID(RAGNAROS_PET_SPECIES_ID)
+	if (petID) then
+		FZL_SetupFlyoutButton(buttonIndex, strjoin(":", "macro", petID, name, icon));
+		buttonIndex = buttonIndex + 1;
+	end
+	petID, name, icon = FZL_PetInfoForSpeciesID(PIERRE_PET_SPECIES_ID)
 	if (petID) then
 		FZL_SetupFlyoutButton(buttonIndex, strjoin(":", "macro", petID, name, icon));
 		buttonIndex = buttonIndex + 1;
@@ -256,11 +269,11 @@ function FZL_GetCookingSpellName()
 	return FZL_CookingSpellName;
 end
 
-function FZL_RagnarosPetID()
+function FZL_PetInfoForSpeciesID(queryID)
 	local isWild = false;
 	for index = 1, C_PetJournal.GetNumPets(isWild) do
 		local petID, speciesID, owned, customName, _, _, _, speciesName, icon = C_PetJournal.GetPetInfoByIndex(index, isWild)
-		if (speciesID == RAGNAROS_PET_SPECIES_ID and owned) then
+		if (speciesID == queryID and owned) then
 			return petID, customName or speciesName, icon;
 		end
 	end	
@@ -276,10 +289,17 @@ function FZL_DetectMethod()
 		return "item:"..WICKERMAN_ITEM_ID;
 	elseif (GetItemCount(GRIM_CAMPFIRE_ITEM_ID) > 0) then
 		return "item:"..GRIM_CAMPFIRE_ITEM_ID;
+	elseif (GetItemCount(ETERNAL_KILN_ITEM_ID) > 0) then
+		return "item:"..ETERNAL_KILN_ITEM_ID;
 	else
-		local petID, name, icon = FZL_RagnarosPetID()
+		local petID, name, icon = FZL_PetInfoForSpeciesID(RAGNAROS_PET_SPECIES_ID)
 		if (petID) then
 			return strjoin(":", "macro", petID, name, icon);
+		else
+			petID, name, icon = FZL_PetInfoForSpeciesID(PIERRE_PET_SPECIES_ID)
+			if (petID) then
+				return strjoin(":", "macro", petID, name, icon);
+			end
 		end
 	end
 	
