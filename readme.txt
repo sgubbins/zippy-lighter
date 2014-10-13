@@ -16,12 +16,17 @@ INSTALLATION: Put this folder into your World Of Warcraft/Interface/AddOns folde
 FEATURES:
 - Adds a button for Basic Fire to the side of the Cooking window.
 - If you have other types of cooking fire available, the button can use them instead of Basic Fire:
-	- Alternate fires include Lil' Ragnaros, Little Wickerman, and Grim Campfire.
+	- Alternate fires include Lil' Ragnaros, Pierre, Little Wickerman, Grim Campfire, and Eternal Kiln.
 	- If any of these is available, ZippyLighter will use it by default.
 	- Hold ALT while mousing over the cooking fire button to change which gets used.
 
 ------------------------------------------------------
 VERSION HISTORY
+
+v. 6.0 - 2014/10/14
+- Updated for WoW Patch 6.0.
+- Alternate cooking fire items (e.g. Grim Campfire) now use the Toy Box feature.
+- Added more alternate cooking fires: the toy item Eternal Kiln and the pet Pierre.
 
 v. 5.2 - 2013/03/05
 - Updated TOC to indicate compatibility with WoW Patch 5.2.
