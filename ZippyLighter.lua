@@ -6,15 +6,18 @@ local addonName, addonTable = ...;
 local BASIC_FIRE_SPELL_ID = 818;
 local COOKING_SPELL_ID = 2550;
 
---local RAGNAROS_PET_SPECIES_ID = 474;	-- fake for testing
-local RAGNAROS_PET_SPECIES_ID = 297;
-local PIERRE_PET_SPECIES_ID = 1204;
+FZL_PetSpecies = {
+	-- 474, -- Cheetah Cub, testing
+	297,	-- Lil' Ragnaros
+	1204,	-- Pierre
+};
 
--- local ETERNAL_KILN_ITEM_ID = 6948;	-- fake for testing
--- local ETERNAL_KILN_ITEM_ID = 6948;	-- fake for testing
-local WICKERMAN_ITEM_ID = 70722;
-local GRIM_CAMPFIRE_ITEM_ID = 67097;
-local ETERNAL_KILN_ITEM_ID = 104309;
+FZL_Toys = {
+	-- 34686,	-- Brazier of Dancing Flames, testing
+	70722,	-- Little Wickerman
+	67097,	-- Grim Campfire
+	104309, -- Eternal Kiln
+};
 
 function FZL_OnEvent(self, event, ...)
 
@@ -102,9 +105,8 @@ function FZL_FireButton_OnEnter(self)
 	local c = GRAY_FONT_COLOR;
 	local title = GetAddOnMetadata(addonName, "Title");
 	local version = GetAddOnMetadata(addonName, "Version");
-	local _, _, revision = string.find("$Revision: 739 $", "(%d+)");
 	
-	GameTooltip:AddDoubleLine(title, string.format("v%s (r%d)", version, revision), c.r, c.g, c.b, c.r, c.g, c.b);
+	GameTooltip:AddDoubleLine(title, string.format("v%s", version), c.r, c.g, c.b, c.r, c.g, c.b);
 
 	if (FZL_HasOtherCookingMethods()) then
 		local keyText = _G[GetModifiedClick("SHOWITEMFLYOUT").."_KEY"];
@@ -139,9 +141,8 @@ function FZL_SetupFireButton(method)
 		FZL_FireButton:SetAttribute("spell", name);
 		FZL_FireButtonCooldown:Show();
 	elseif (kind == "item") then	-- item
-		name, _, _, _, _, _, _, _, _, icon = GetItemInfo(id);
-		FZL_FireButton:SetAttribute("type", "item");
-		FZL_FireButton:SetAttribute("item", name);
+		FZL_FireButton:SetAttribute("type", "macro");
+		FZL_FireButton:SetAttribute("macrotext", "/usetoy "..name);
 		FZL_FireButtonCooldown:Show();
 	else
 		FZL_FireButton:SetAttribute("type", "macro");
@@ -206,9 +207,7 @@ function FZL_SetupFlyoutButton(index, method)
 	end
 	if (kind == "spell") then
 		_, _, icon = GetSpellInfo(id);		
-	elseif (kind == "item")	then -- item
-		_, _, _, _, _, _, _, _, _, icon = GetItemInfo(id);
-	elseif (kind ~= "macro") then
+	elseif (kind ~= "macro" and kind ~= "item") then
 		icon = "Interface\\Icons\\INV_Misc_QuestionMark";
 	end
 	local buttonIcon = _G["FZL_FlyoutButton"..index.."Icon"];
@@ -225,29 +224,24 @@ function FZL_ShowFlyout()
 	end
 	local buttonIndex = 1;
 		
-	if (GetItemCount(WICKERMAN_ITEM_ID) > 0) then
-		FZL_SetupFlyoutButton(buttonIndex, "item:"..WICKERMAN_ITEM_ID);
-		buttonIndex = buttonIndex + 1;
-	end
-	if (GetItemCount(GRIM_CAMPFIRE_ITEM_ID) > 0) then
-		FZL_SetupFlyoutButton(buttonIndex, "item:"..GRIM_CAMPFIRE_ITEM_ID);
-		buttonIndex = buttonIndex + 1;
-	end
-	if (GetItemCount(ETERNAL_KILN_ITEM_ID) > 0) then
-		FZL_SetupFlyoutButton(buttonIndex, "item:"..ETERNAL_KILN_ITEM_ID);
-		buttonIndex = buttonIndex + 1;
-	end
-	local petID, name, icon = FZL_PetInfoForSpeciesID(RAGNAROS_PET_SPECIES_ID)
-	if (petID) then
-		FZL_SetupFlyoutButton(buttonIndex, strjoin(":", "macro", petID, name, icon));
-		buttonIndex = buttonIndex + 1;
-	end
-	petID, name, icon = FZL_PetInfoForSpeciesID(PIERRE_PET_SPECIES_ID)
-	if (petID) then
-		FZL_SetupFlyoutButton(buttonIndex, strjoin(":", "macro", petID, name, icon));
-		buttonIndex = buttonIndex + 1;
+	for toyIndex = 1, #FZL_Toys do
+		local toyItemID = FZL_Toys[toyIndex];
+		if (PlayerHasToy(toyItemID)) then
+			local _, toyName, icon = C_ToyBox.GetToyInfo(toyItemID);
+			FZL_SetupFlyoutButton(buttonIndex, strjoin(":", "item", toyItemID, toyName, icon));
+			buttonIndex = buttonIndex + 1;
+		end
 	end
 	
+	for petIndex = 1, #FZL_PetSpecies do
+		local petSpeciesID = FZL_PetSpecies[petIndex];
+		local petID, name, icon = FZL_PetInfoForSpeciesID(petSpeciesID);
+		if (petID) then
+			FZL_SetupFlyoutButton(buttonIndex, strjoin(":", "macro", petID, name, icon));
+			buttonIndex = buttonIndex + 1;
+		end
+	end
+		
 	FZL_SetupFlyoutButton(buttonIndex, "spell:"..BASIC_FIRE_SPELL_ID);
 	buttonIndex = buttonIndex + 1;
 
@@ -285,21 +279,19 @@ end
 
 function FZL_DetectMethod()
 	
-	if (GetItemCount(WICKERMAN_ITEM_ID) > 0) then
-		return "item:"..WICKERMAN_ITEM_ID;
-	elseif (GetItemCount(GRIM_CAMPFIRE_ITEM_ID) > 0) then
-		return "item:"..GRIM_CAMPFIRE_ITEM_ID;
-	elseif (GetItemCount(ETERNAL_KILN_ITEM_ID) > 0) then
-		return "item:"..ETERNAL_KILN_ITEM_ID;
-	else
-		local petID, name, icon = FZL_PetInfoForSpeciesID(RAGNAROS_PET_SPECIES_ID)
+	for toyIndex = 1, #FZL_Toys do
+		local toyItemID = FZL_Toys[toyIndex];
+		if (PlayerHasToy(toyItemID)) then
+			local _, toyName, icon = C_ToyBox.GetToyInfo(toyItemID);
+			return strjoin(":", "item", toyItemID, toyName, icon);
+		end
+	end
+	
+	for petIndex = 1, #FZL_PetSpecies do
+		local petSpeciesID = FZL_PetSpecies[petIndex];
+		local petID, name, icon = FZL_PetInfoForSpeciesID(petSpeciesID);
 		if (petID) then
 			return strjoin(":", "macro", petID, name, icon);
-		else
-			petID, name, icon = FZL_PetInfoForSpeciesID(PIERRE_PET_SPECIES_ID)
-			if (petID) then
-				return strjoin(":", "macro", petID, name, icon);
-			end
 		end
 	end
 	
