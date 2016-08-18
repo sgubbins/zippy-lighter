@@ -4,7 +4,7 @@
 local addonName, addonTable = ...; 
 
 local BASIC_FIRE_SPELL_ID = 818;
-local COOKING_SPELL_ID = 2550;
+local COOKING_SKILL_ID = 185;
 
 FZL_PetSpecies = {
 	-- 474, -- Cheetah Cub, testing
@@ -30,8 +30,8 @@ function FZL_OnEvent(self, event, ...)
 		end
 		self:UnregisterEvent("PLAYER_REGEN_ENABLED");
 		
-		local skillName = GetTradeSkillLine();
-		if (skillName == FZL_GetCookingSpellName()) then
+		local skillID = C_TradeSkillUI.GetTradeSkillLine();
+		if (skillID == COOKING_SKILL_ID) then
 			if (not FZL_FireButton) then
 				FZL_CreateFireButton();
 			end
@@ -61,10 +61,10 @@ function FZL_OnEvent(self, event, ...)
 		local start, duration, enable;
 		if (kind == "spell") then
 			start, duration, enable = GetSpellCooldown(id);
-			CooldownFrame_SetTimer(FZL_FireButtonCooldown, start, duration, enable);
+			CooldownFrame_Set(FZL_FireButtonCooldown, start, duration, enable);
 		elseif (kind == "item") then
 			start, duration, enable = GetItemCooldown(id);
-			CooldownFrame_SetTimer(FZL_FireButtonCooldown, start, duration, enable);
+			CooldownFrame_Set(FZL_FireButtonCooldown, start, duration, enable);
 		end		
 
 	elseif (event == "SPELL_UPDATE_USABLE" and FZL_FireButton) then
@@ -256,13 +256,6 @@ end
 ------------------------------------------------------
 -- utility functions
 ------------------------------------------------------
-
-function FZL_GetCookingSpellName()
-	if (not FZL_CookingSpellName) then
-		FZL_CookingSpellName = GetSpellInfo(COOKING_SPELL_ID);
-	end
-	return FZL_CookingSpellName;
-end
 
 function FZL_PetInfoForSpeciesID(queryID)
 	local isWild = false;
