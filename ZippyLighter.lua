@@ -17,6 +17,7 @@ FZL_Toys = {
 	70722,	-- Little Wickerman
 	67097,	-- Grim Campfire
 	104309, -- Eternal Kiln
+	116757, -- Steamworks Sausage Grill
 };
 
 function FZL_OnEvent(self, event, ...)

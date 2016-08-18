@@ -23,6 +23,10 @@ FEATURES:
 ------------------------------------------------------
 VERSION HISTORY
 
+v. 7.0 - 2016/08/18
+- Updated for WoW Patch 7.0.
+- Added Steamworks Sausage Grill to the list of supported toys.
+
 v. 6.0 - 2014/10/14
 - Updated for WoW Patch 6.0.
 - Alternate cooking fire items (e.g. Grim Campfire) now use the Toy Box feature.
