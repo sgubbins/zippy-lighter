@@ -24,7 +24,7 @@ FEATURES:
 VERSION HISTORY
 
 v. 7.0 - 2016/08/18
-- Updated for WoW Patch 7.0.
+- Updated for WoW Patch 7.0 and Legion.
 - Added Steamworks Sausage Grill to the list of supported toys.
 
 v. 6.0 - 2014/10/14
