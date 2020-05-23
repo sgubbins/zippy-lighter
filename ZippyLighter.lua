@@ -14,10 +14,17 @@ FZL_PetSpecies = {
 
 FZL_Toys = {
 	-- 34686,	-- Brazier of Dancing Flames, testing
-	70722,	-- Little Wickerman
-	67097,	-- Grim Campfire
+	34686,  -- Brazier of Dancing Flames
+	70722,  -- Little Wickerman
+	67097,  -- Grim Campfire
 	104309, -- Eternal Kiln
+	116435, -- Cozy Bonfire
 	116757, -- Steamworks Sausage Grill
+	117573, -- Wayfarer's Bonfire
+	127652, -- Felflame Campfire
+	128536, -- Leylight Brazier
+	153039, -- Crystalline Campfire
+	163211, -- Akunda's Firesticks
 };
 
 function FZL_OnEvent(self, event, ...)
